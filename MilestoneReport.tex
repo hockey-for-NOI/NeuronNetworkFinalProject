@@ -1,0 +1,281 @@
+\documentclass{article}
+
+% if you need to pass options to natbib, use, e.g.:
+% \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading nips_2016
+%
+% to avoid loading the natbib package, add option nonatbib:
+% \usepackage[nonatbib]{nips_2016}
+
+%\usepackage{nips_2016}
+
+% to compile a camera-ready version, add the [final] option, e.g.:
+\usepackage[final]{Milestone}
+\usepackage{graphicx}
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{CJKutf8}
+
+\begin{CJK*}{UTF8}{gbsn}
+\title{《人工神经网络》大作业中期报告}
+
+
+% The \author macro works with any number of authors. There are two
+% commands used to separate the names and addresses of multiple
+% authors: \And and \AND.
+%
+% Using \And between authors leaves it to LaTeX to determine where to
+% break the lines. Using \AND forces a line break at that point. So,
+% if LaTeX puts 3 of 4 authors names on the first line, and the last
+% on the second line, try using \AND instead of \And before the third
+% author name.
+
+\author{
+  \textbf{刘熙航}\\
+  计算机科学与技术系 \\
+  清华大学 \\
+  \texttt{liuxh15@mails.tsinghua.edu.cn} \\
+  %% examples of more authors
+  \and
+  \textbf{何琦}\\
+  计算机科学与技术系 \\
+  清华大学 \\
+  \texttt{hq15@mails.tsinghua.edu.cn} \\
+  %% \And
+  %% Coauthor \\
+  %% Affiliation \\
+  %% Address \\
+  %% \texttt{email} \\
+}
+
+\begin{document}
+
+\maketitle
+
+\section{引言}
+
+与实验室中的传统任务已有固定数据集的情况不同，在真实的场景里，数据是不断产生的，数据的质量也会随着时间不断的变化。此外，在真实的场景里，如推荐系统的内容推荐，也会存在着新数据比旧数据更有价值的现象。我们所希望探究的，就是如何利用“相对更没有价值的数据”去达到提升神经网络准确率的目的。
+
+在开题报告中，我们已经提到，我们所希望的是在一个已有的数据集上，施加定量的影响，进而达到研究不同的影响程度对学习准确率影响的目的。\textbf{该任务将分为Classification和Regression两部分进行}。此外，我们也阅读了一些相关文献，此外也思考得出了一些可能有用的算法。这些算法的效果（注：在最终的报告中，我们不会仅使用这些策略进行）我们将在结题报告中进行展示。
+
+\section{问题陈述}
+\subsection{问题定义}
+首先，会按照数据与最终数据的相似程度，将其分为n+2个stage(编号0~n+1)。其中第0个stage与最终数据相似程度最低，相似程度随编号增加而提高，第n+1个stage即为最终数据集。之后，将会完成以下两个任务。（数据集处理的具体方法见2.2部分“数据集的处理方法”。）
+\begin{itemize}
+    \item 任务1:在中间的n个stage的数据集上训练n个神经网络，并将第i组数据训练所得到的神经网络在相邻的两个stage（即stage(i-1)和stage(i+1)上进行测试），在这一步，我们所需要关注的是数据的准确率。
+    
+    \textbf{优化目标：本任务为实验型任务，没有优化}
+    
+    \item 任务2:该任务将训练两个模型：
+    
+    A模型：在预训练阶段，可以无限获取前n+1个stage的全部数据，且在正式训练时可以获取n+2个stage的全部数据。
+
+    B模型：不经过预训练，正式训练时仅可以获取第n+1个stage的数据。
+
+    该任务的内容为：\textbf{得出一个策略$\alpha*$,使得该策略下，经过预训练的A模型，可以通过相同的迭代次数，得到超过B模型的表现。}
+    
+    \textbf{优化目标：A模型在最后一个stage下的准确率和收敛速度}
+\end{itemize}
+\subsection{数据集处理方法}
+
+\subsubsection{Classification部分}
+
+在这部分里，我们对常用的MNIST数据集进行了预实验，数据集的处理方法为：取前若干个train data进行训练，至accuracy稳定之后，等待五个epoch。我们表格中的数据即为稳定之后的accuracy。
+
+具体的实验方法为：设置不同大小的train set, 网络结构为input-relu-BN-softmaxloss, hidden size = 200.
+
+\begin{center}
+    \begin{tabular}{|c|c|}
+        \hline
+        Train Size & Accuracy \\
+        \hline
+        60000 & 0.9745 \\
+        \hline
+        30000 & 0.9689 \\
+        \hline
+        15000 & 0.9600 \\
+        \hline
+        10000 & 0.9568 \\
+        \hline
+        7500 & 0.9527 \\
+        \hline
+        6000 & 0.9440 \\
+        \hline
+        5000 & 0.9407 \\
+        \hline
+        4000 & 0.9378 \\
+        \hline
+        3000 & 0.9241 \\
+        \hline
+        2500 & 0.9158 \\
+        \hline
+        2000 & 0.9102 \\
+        \hline
+        1500 & 0.9019 \\
+        \hline
+        1000 & 0.8896 \\
+        \hline
+    \end{tabular}
+\end{center}
+
+以上为预实验的结果。从中我们可以发现，在train size为4000和3000的两个点之间，是best accuracy = 1 - $\frac{60000}{Train\_size}$的临界点。故我们也将按照3000和4000的train size进行测试。
+
+\subsubsection{Regression部分}
+
+在这一部分里，理想的数据集应该具有以下三个性质。
+
+\begin{itemize}
+    \item 有真实的意义，且随时间不断变化。
+    \item 变化在时间上连续。
+    \item 我们可以在其上设置一个确定且不断变化的label。
+\end{itemize}
+
+鉴于满足这一条件的数据较为难以获得（我们无法获得公司的真实用户数据）。我们选择了以下的数据集和处理方式：
+
+数据集：选择了国债期货在2015年至2017年11月的全部价格数据。数据集的大小为1210 * 16201（其中每日有两段时间，每段时间的长度为2小时15分钟。每秒钟有两个数据。一共有605天，故数据集的大小为1210 * 16201，其中16201 = (2 * 60 + 15) * 120 + 1 ）。为了方便对数据进行切分，同时剔除掉一些波动较为剧烈的部分（每段时间的开始和结束的波动较为剧烈，我们绘制了2017年2月3日上午和2017年3月15日下午的波动，可以看出，前几分钟的波动较为明显，因此，我们去掉了每个时间段约前150秒和后100秒的数据。保留了13700个timestamp。之后依据每个timestamp生成了135个数据。生成方式为：第i个数据是去掉波动之后的第i至第(i + 300)个timestamp。选择300个timestamp的原因为，这样可以比较明显的区分出第40个和第60个percentile。
+\begin{figure}
+\centering
+\includegraphics[width=0.4\textwidth]{Price_20170203Morning.png}
+\caption{2017年2月3日上午}
+\includegraphics[width=0.4\textwidth]{Price_20170315.png}
+\caption{2017年3月15日下午}
+
+\end{figure}
+
+\section{方法}
+
+对于任务1，我们所需要进行的任务为对神经网络进行相关的训练。这一步仅仅为得到一个概念性的结果。而对于任务二，我们希望可以通过如下几种思路来达到我们的目的。
+
+\begin{itemize}
+    \item 采用普通的思路去训练可以在训练开始之前无限制获取前n个阶段全部数据的模型。但是在模型中加入Batch\_normalization，drop out$^{[1]}$等可以提高模型鲁棒性的方法，之后在最后一个阶段的模型上进行refine操作。
+    \item 将之前某一阶段的得到的模型也引入最终的分析过程，但将该模型所做决定的权值置为负，与最后一阶段训练所得到的模型合作进行评估。
+    \item 在最后一阶段的训练中进行resample, 即每次训练均采用随机batch，但是每个位置被随机到的概率不同，且和数据的“价值”正相关。（对于classification，stage越接近的数据被抽取到的概率越高，而对于regression，则是时间上越接近的数据被抽取到的概率越高，这也是我们使用国债期货的价格数据这一看似不合理的决定的原因所在）。
+    \item 对于regression部分，参考data mixup$^{[2]}$的思路，将若干个连续的数据集混合。（对于classification部分）因为我们知道，最后一个stage的数据训练得到模型的accuracy是位于倒数第二个stage的数据训练得到的模型附近的，故至少可以确定的是，倒数第二个数据仍然存在价值。但是如何利用其价值，才是我们所需要研究的。
+\end{itemize}
+
+\section{初步结果}
+
+按照proposal，这一步我们主要进行了数据集的选取，并对任务一在MNIST数据集上，按照15和20个数据集分别进行了切分，并进行了训练。训练结果如下(Stage从0开始编号)：
+
+对于15-split的数据（所采用的网络结构与之前相同）：
+
+\begin{center}
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        Stage & Train Loss & Train Acc & Test Acc on stage (i-1) & test Acc on stage (i+1) \\
+        \hline
+        1 & 0.14659 & 0.9682 & 0.8671 & 0.7574 \\
+        \hline
+        2 & 0.30534 & 0.9078 & 0.7662 & 0.6305 \\
+        \hline
+        3 & 0.39130 & 0.8755 & 0.6838 & 0.6064 \\
+        \hline
+        4 & 0.45357 & 0.8378 & 0.5808 & 0.5305 \\
+        \hline
+        5 & 0.48639 & 0.8298 & 0.5410 & 0.4669 \\
+        \hline
+        6 & 0.51565 & 0.8070 & 0.4410 & 0.4515 \\
+        \hline
+        7 & 0.55104 & 0.7978 & 0.4464 & 0.4420 \\
+        \hline
+        8 & 0.54878 & 0.7878 & 0.4333 & 0.4817 \\
+        \hline
+        9 & 0.50619 & 0.8207 & 0.4910 & 0.5333 \\
+        \hline
+        10 & 0.47346 & 0.8209 & 0.5253 & 0.6028 \\
+        \hline
+        11 & 0.39928 & 0.8702 & 0.5723 & 0.6810 \\
+        \hline
+        12 & 0.31139 & 0.9043 & 0.6579 & 0.7674 \\
+        \hline
+        13 & 0.17340 & 0.9573 & 0.7567 & 0.8923 \\
+        \hline
+    \end{tabular}
+\end{center}
+
+对于20-split的数据：
+
+\begin{center}
+    \begin{tabular}{|c|c|c|c|c|}
+        \hline
+        Stage & Train Loss & Train Acc & Test Acc on stage (i-1) & test Acc on stage (i+1) \\
+        \hline
+        1 & 0.11731 & 0.9740 & 0.8717 & 0.7624 \\
+        \hline
+        2 & 0.20302 & 0.9520 & 0.8186 & 0.7313 \\
+        \hline
+        3 & 0.27159 & 0.9286 & 0.7224 & 0.6310 \\
+        \hline
+        4 & 0.31405 & 0.9097 & 0.6821 & 0.5969 \\
+        \hline
+        5 & 0.41162 & 0.8723 & 0.5803 & 0.5482 \\
+        \hline
+        6 & 0.42484 & 0.8623 & 0.5158 & 0.4789 \\
+        \hline
+        7 & 0.43077 & 0.8650 & 0.5238 & 0.4659 \\
+        \hline
+        8 & 0.47592 & 0.8340 & 0.4593 & 0.4393 \\
+        \hline
+        9 & 0.47767 & 0.8490 & 0.4448 & 0.4334 \\
+        \hline
+        10 & 0.48371 & 0.8420 & 0.4414 & 0.4590 \\
+        \hline
+        11 & 0.43566 & 0.8640 & 0.4324 & 0.4614 \\
+        \hline
+        12 & 0.43208 & 0.8673 & 0.4686 & 0.4951 \\
+        \hline
+        13 & 0.38326 & 0.8677 & 0.4724 & 0.5252 \\
+        \hline
+        14 & 0.35013 & 0.9023 & 0.5620 & 0.6069 \\
+        \hline
+        15 & 0.31520 & 0.9160 & 0.5900 & 0.6368 \\
+        \hline
+        16 & 0.24488 & 0.9427 & 0.6552 & 0.7331 \\
+        \hline
+        17 & 0.20086 & 0.9517 & 0.7100 & 0.7927 \\
+        \hline
+        18 & 0.10698 & 0.9823 & 0.7941 & 0.9028 \\
+        \hline
+    \end{tabular}
+\end{center}
+
+从实验中我们发现，对于最苛刻的数据（即15-split数据中的第7组，20-split数据中的第9、10组，正确率均显著低于了50\%）。对于15-split的数据，采用原有label训练得到的test accuracy为0.9378，而有一半误标注的情况下，其为0.4334，远小于$\frac{0.9378}{2}$。而对于20split的数据，在一半误标注的数据里，其准确率为0.4334，远低于采用远数据训练所得到的0.9241的一半。
+
+注意到：$(\frac{1}{2} - (\frac{0.8}{2} * (1 - 0.9241))- 0.4334 = 0.03624$
+而$(\frac{1}{2} - (\frac{0.8}{2} * (1 - 0.9378))- 0.4420 = 0.03312$。
+\textbf{在两种情况下，所得到的准确率均比其期望准确率降低了3\%以上。由此可见，错误的标注、或者错误的标注方式对数据训练得到的结果有着极大的影响。}
+
+但与此同时，我们也发现，尽管施加的影响是随机的，但是模型的train accuracy一直处于一个比较好的水平（对于最难以提升准确率的数据，其准确率仍然超过了0.8）。因此，\textbf{随机对数据集进行划分，可能会导致模型学到overfit的参数，但是就模型的train accuracy表现而言，不会呈现出较为明显的差距。}
+
+而对于Regression部分，我们也将进行类似的实验，这一步将在最终的结题报告中体现。
+
+\section{目前的困难}
+
+我们认为，目前的困难主要来源于以下两个方面：
+
+\begin{itemize}
+    \item 不能保证我们提到的三种训练方法在Regression和Classification上均可以达到优化模型表现的效果。
+    \item 相关可以提升模型鲁棒性的参考文献较少，除去mixup之外，其都是很传统的模型，不能保证实现比较优秀的效果。
+    \item 此外，由于Regression部分仅仅进行了数据的选取，并未进行相关的训练操作，故在接下来数据的标注可能也会因为训练而改动，这也可能带来较大的任务量，影响整个项目的正常进行。
+\end{itemize}
+
+\section*{参考文献}
+
+\medskip
+
+\small
+
+[1] Sergey, L.\ \& Charstian, S.\ (2015) Batch Normalization: Accelerating Deep Network Training by Reducing Internal Covariance Shift, {\it https://arxiv.org/abs/1502.03167}.
+
+[2] Hong yi, Z.\ \& Moustapha, C. et al\ (2017) mixup: Beyond Empirical Risk Minimization, {\it https://arxiv.org/abs/1710.09412}
+
+\end{document}
+
+\end{CJK*}

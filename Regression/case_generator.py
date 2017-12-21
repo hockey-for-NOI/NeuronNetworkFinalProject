@@ -29,7 +29,7 @@ print sample.shape
 
 for i in range(sample.shape[0]):
 	if (i < 50000):
-		csv_writer_2.writerow([float(sorted(sample[i])[int(200 * 0.75) - 1])])
+		csv_writer_2.writerow([float(sorted(sample[i])[int(200 * 0.25) - 1])])
 		continue
 	if (i < 100000):
 		csv_writer_2.writerow([float(sorted(sample[i])[int(200 * 0.50) - 1])])

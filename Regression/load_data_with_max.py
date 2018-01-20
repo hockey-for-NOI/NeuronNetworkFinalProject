@@ -12,13 +12,15 @@ def load_data(nsplit):
     
     train_label = np.zeros([nsplit, train_data.shape[1]])
     test_label = np.zeros(test_data.shape[0])
+    extra_label = np.zeros(train_label.shape)
     
     for isplit in range(nsplit):
         pos = int(300 * ((.6 - .4) * isplit / (nsplit - 1) + .4))
         for idx in range(train_data.shape[1]):
             train_label[isplit][idx] = sorted(train_data[isplit][idx])[pos]
-            
+            extra_label[isplit][idx] = sorted(train_data[isplit][idx])[-1]
+                        
     for idx in range(test_data.shape[0]):
         test_label[idx] = sorted(test_data[idx])[int(300 * .6)]
         
-    return train_data, test_data, train_label, test_label
+    return train_data, test_data, train_label, test_label, extra_label

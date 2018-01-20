@@ -1,33 +1,10 @@
 import numpy as np
 import tensorflow as tf
-import csv
+import pickle
 import random
+from load_data import load_data
 
-DATA_FILE_NAME = 't_price_cut.csv'
-LABEL_FILE_NAME = 't_label.csv'
-
-data = []
-label = []
-
-data_reader = csv.reader(open(DATA_FILE_NAME))
-label_reader = csv.reader(open(LABEL_FILE_NAME))
-
-for row in data_reader:
-	data.append(row)
-
-for row in label_reader:
-	label.append(row)
-
-data = np.array(data)
-data = data.astype(float)
-label = np.array(label)
-label = label.astype(float)
-
-
-train_data = data[0000:50000, :]
-train_label = label[0000:50000, :]
-test_data = data[150000:, :]
-test_label = label[150000:, :]
+train_data, train_label, test_data, test_label = load_data(nsplit)
 
 batch_size = 100
 start_idx = 0

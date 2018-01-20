@@ -75,8 +75,8 @@ def work(n_split):
 
     mlp_model = Model(True)
 
-    model_pref = "MLP_std_{}split_min".format(n_split)
-    train_dir = "{}_std_{}split_min".format(FLAGS.train_dir_pref, n_split)
+    model_pref = "MLP_std_{}split_max".format(n_split)
+    train_dir = "{}_std_{}split_max".format(FLAGS.train_dir_pref, n_split)
 
     if not os.path.exists(train_dir):
         os.mkdir(train_dir)
